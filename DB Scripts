@@ -1,0 +1,180 @@
+-- Create Patients Table
+CREATE TABLE Patients (
+    PatientID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    DateOfBirth DATE,
+    Gender VARCHAR(10) CHECK (Gender IN ('Male', 'Female', 'Other')),
+    ContactNumber VARCHAR(15),
+    Email VARCHAR(100),
+    Address TEXT,
+    RegistrationDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert Sample Patients
+INSERT INTO Patients (FirstName, LastName, DateOfBirth, Gender, ContactNumber, Email, Address)
+VALUES 
+('Arun', 'Kumar', '1990-05-15', 'Male', '9876543210', 'arun.k@example.com', 'Chennai, India'),
+('Priya', 'Sharma', '1985-08-25', 'Female', '9123456789', 'priya.s@example.com', 'Mumbai, India');
+
+-- Create Doctors Table
+CREATE TABLE Doctors (
+    DoctorID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Specialization VARCHAR(100),
+    ContactNumber VARCHAR(15),
+    Email VARCHAR(100),
+    ExperienceYears INT
+);
+
+-- Insert Sample Doctors
+INSERT INTO Doctors (FirstName, LastName, Specialization, ContactNumber, Email, ExperienceYears)
+VALUES 
+('Dr. Raj', 'Mehta', 'Ophthalmologist', '7890123456', 'raj.mehta@example.com', 15),
+('Dr. Sunita', 'Verma', 'Retina Specialist', '8901234567', 'sunita.verma@example.com', 10);
+
+-- Create Appointments Table
+CREATE TABLE Appointments (
+    AppointmentID SERIAL PRIMARY KEY,
+    PatientID INT REFERENCES Patients(PatientID) ON DELETE CASCADE,
+    DoctorID INT REFERENCES Doctors(DoctorID) ON DELETE CASCADE,
+    AppointmentDate TIMESTAMP,
+    Status VARCHAR(20) CHECK (Status IN ('Scheduled', 'Completed', 'Cancelled')),
+    Notes TEXT
+);
+
+-- Insert Sample Appointments
+INSERT INTO Appointments (PatientID, DoctorID, AppointmentDate, Status, Notes)
+VALUES 
+(1, 1, '2025-03-01 10:30:00', 'Scheduled', 'Routine eye checkup'),
+(2, 2, '2025-03-02 11:00:00', 'Scheduled', 'Diabetic retinopathy evaluation');
+
+-- Create Treatments Table
+CREATE TABLE Treatments (
+    TreatmentID SERIAL PRIMARY KEY,
+    AppointmentID INT REFERENCES Appointments(AppointmentID) ON DELETE CASCADE,
+    TreatmentName VARCHAR(100),
+    TreatmentCost DECIMAL(10,2),
+    TreatmentDate DATE
+);
+
+-- Insert Sample Treatments
+INSERT INTO Treatments (AppointmentID, TreatmentName, TreatmentCost, TreatmentDate)
+VALUES 
+(1, 'Cataract Surgery', 20000.00, '2025-03-01'),
+(2, 'Lasik Surgery', 35000.00, '2025-03-02');
+
+-- Create Billing Table
+CREATE TABLE Billing (
+    BillID SERIAL PRIMARY KEY,
+    PatientID INT REFERENCES Patients(PatientID) ON DELETE CASCADE,
+    TreatmentID INT REFERENCES Treatments(TreatmentID) ON DELETE CASCADE,
+    TotalAmount DECIMAL(10,2),
+    PaymentStatus VARCHAR(10) CHECK (PaymentStatus IN ('Paid', 'Pending')),
+    PaymentMethod VARCHAR(20) CHECK (PaymentMethod IN ('Cash', 'Credit Card', 'Online')),
+    BillDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert Sample Billing Data
+INSERT INTO Billing (PatientID, TreatmentID, TotalAmount, PaymentStatus, PaymentMethod)
+VALUES 
+(1, 1, 20000.00, 'Paid', 'Credit Card'),
+(2, 2, 35000.00, 'Pending', 'Cash');
+
+-- Create Inventory Table (For Eye Hospital Equipments & Medicines)
+CREATE TABLE Inventory (
+    ItemID SERIAL PRIMARY KEY,
+    ItemName VARCHAR(100),
+    Category VARCHAR(50),
+    Quantity INT,
+    Supplier VARCHAR(100),
+    PurchaseDate DATE,
+    ExpiryDate DATE
+);
+
+-- Insert Sample Inventory Data
+INSERT INTO Inventory (ItemName, Category, Quantity, Supplier, PurchaseDate, ExpiryDate)
+VALUES 
+('Contact Lenses', 'Optical', 100, 'VisionCare Pvt Ltd', '2025-02-01', '2026-02-01'),
+('Eye Drops', 'Medicine', 200, 'PharmaPlus', '2025-02-05', '2026-08-10');
+-- Insert More Patients
+INSERT INTO Patients (FirstName, LastName, DateOfBirth, Gender, ContactNumber, Email, Address)
+VALUES 
+('Ravi', 'Verma', '1982-07-20', 'Male', '9012345678', 'ravi.v@example.com', 'Delhi, India'),
+('Sonia', 'Gupta', '1995-11-12', 'Female', '9898123456', 'sonia.g@example.com', 'Bangalore, India'),
+('Karan', 'Singh', '1978-04-05', 'Male', '9234567890', 'karan.s@example.com', 'Hyderabad, India'),
+('Meena', 'Iyer', '1990-09-30', 'Female', '9812345678', 'meena.i@example.com', 'Pune, India');
+
+-- Insert More Doctors
+INSERT INTO Doctors (FirstName, LastName, Specialization, ContactNumber, Email, ExperienceYears)
+VALUES 
+('Dr. Aman', 'Sharma', 'Cornea Specialist', '9811123456', 'aman.sharma@example.com', 12),
+('Dr. Rekha', 'Das', 'Glaucoma Specialist', '9701234567', 'rekha.das@example.com', 14),
+('Dr. Nitin', 'Kapoor', 'Pediatric Ophthalmologist', '8801234567', 'nitin.kapoor@example.com', 10);
+
+-- Insert More Appointments
+INSERT INTO Appointments (PatientID, DoctorID, AppointmentDate, Status, Notes)
+VALUES 
+(3, 2, '2025-03-05 09:00:00', 'Scheduled', 'Regular eye checkup'),
+(4, 3, '2025-03-06 14:00:00', 'Scheduled', 'Eye irritation and redness'),
+(5, 1, '2025-03-07 10:00:00', 'Scheduled', 'Cataract evaluation'),
+(6, 2, '2025-03-08 11:30:00', 'Scheduled', 'Vision problem consultation');
+
+-- Insert More Treatments
+INSERT INTO Treatments (AppointmentID, TreatmentName, TreatmentCost, TreatmentDate)
+VALUES 
+(3, 'Retina Checkup', 5000.00, '2025-03-05'),
+(4, 'Eye Infection Treatment', 2500.00, '2025-03-06'),
+(5, 'Cataract Surgery', 22000.00, '2025-03-07'),
+(6, 'Vision Correction Therapy', 15000.00, '2025-03-08');
+
+-- Insert More Billing Data
+INSERT INTO Billing (PatientID, TreatmentID, TotalAmount, PaymentStatus, PaymentMethod)
+VALUES 
+(3, 3, 5000.00, 'Paid', 'Cash'),
+(4, 4, 2500.00, 'Pending', 'Online'),
+(5, 5, 22000.00, 'Paid', 'Credit Card'),
+(6, 6, 15000.00, 'Pending', 'Cash');
+
+-- Insert More Inventory Items
+INSERT INTO Inventory (ItemName, Category, Quantity, Supplier, PurchaseDate, ExpiryDate)
+VALUES 
+('Surgical Blades', 'Surgical Equipment', 50, 'MedEquip Ltd', '2025-01-10', '2027-01-10'),
+('Protective Eyewear', 'Optical', 75, 'VisionCare Pvt Ltd', '2025-02-15', '2027-02-15'),
+('Antibiotic Eye Drops', 'Medicine', 300, 'PharmaPlus', '2025-03-01', '2026-09-01'),
+('Sterile Gloves', 'Medical Supply', 500, 'MediSafe Supplies', '2025-02-20', '2027-02-20');
+CREATE VIEW HospitalOverview AS
+SELECT 
+    p.PatientID, 
+    p.FirstName AS PatientFirstName, 
+    p.LastName AS PatientLastName, 
+    p.DateOfBirth, 
+    p.Gender, 
+    p.ContactNumber AS PatientContact, 
+    p.Email AS PatientEmail, 
+    p.Address AS PatientAddress, 
+    d.DoctorID, 
+    d.FirstName AS DoctorFirstName, 
+    d.LastName AS DoctorLastName, 
+    d.Specialization, 
+    d.ContactNumber AS DoctorContact, 
+    d.Email AS DoctorEmail, 
+    a.AppointmentID, 
+    a.AppointmentDate, 
+    a.Status AS AppointmentStatus, 
+    a.Notes AS AppointmentNotes, 
+    t.TreatmentID, 
+    t.TreatmentName, 
+    t.TreatmentCost, 
+    t.TreatmentDate, 
+    b.BillID, 
+    b.TotalAmount, 
+    b.PaymentStatus, 
+    b.PaymentMethod, 
+    b.BillDate
+FROM Patients p
+LEFT JOIN Appointments a ON p.PatientID = a.PatientID
+LEFT JOIN Doctors d ON a.DoctorID = d.DoctorID
+LEFT JOIN Treatments t ON a.AppointmentID = t.AppointmentID
+LEFT JOIN Billing b ON t.TreatmentID = b.TreatmentID;
